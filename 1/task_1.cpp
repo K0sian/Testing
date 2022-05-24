@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <tuple>
 
-
+//класс манипулятора
 class Hand
 {
 public:
@@ -33,15 +33,19 @@ public:
 	std::pair<double, double>Coord;
 };
 
+//шаблонная фн для поиска оптимального манипулятора
+//возвращает итератор манипулятора из входного контейнера
+//шаблон чтобы отвязаться от контейнера и не писать полностью название итератора
 template<class _It>
 _It find_best_hand(const _It begin_it,
 					const _It end_it,
 					const std::pair<double, double>& dot)
 {
 	using pair_d_pHand = std::pair<double, _It>;
+	//вектор доступных манипуляторв с расчитанным радиусом
 	std::vector<pair_d_pHand> hand_in_range;
 
-	
+	//расчёт радиуса
 	for(auto a = begin_it; a != end_it; a++)
 	{
 		auto dx = dot.first - (*a).Coord.first;
@@ -54,24 +58,29 @@ _It find_best_hand(const _It begin_it,
 	}
 	if(hand_in_range.size() < 1) { return end_it; }
 
+	//поиск ближайшего манипулятора
 	constexpr auto hand_cmp([](const auto &a, const auto &b) constexpr
 	{
 		return a.first < b.first;
 	});
 	auto rez = std::min_element(begin(hand_in_range), end(hand_in_range), hand_cmp);
-	
+
 	return (*rez).second;
 }
 
 int main()
 {
+	//список манипуляторов
 	std::vector hands
 	{
 		Hand{0.0,	0.0,	60.0},
 		Hand{0.0,	100.0,	60.0}
 	};
+
+	//рабочая точка
 	std::pair<double, double> dot{ 0, 51 };
 
+	//полуем итератор оптимального манипулятора
 	auto hand = find_best_hand(begin(hands), end(hands), dot);
 
 	if(hand == end(hands))
@@ -81,6 +90,7 @@ int main()
 	else
 	{
 		std::cout << "using hand id "
+			//индекс найденого манипулятора в контейнере
 			<< std::distance(begin(hands), hand)
 			<< '\n';
 	}

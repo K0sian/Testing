@@ -29,10 +29,12 @@ P.S. При написании кода обратите внимание на �
 
 bool run_gcode(const std::string& str)
 {
+	//состояние системы
 	int x = 0;
 	int y = 0;
 	int z = 0;
 
+	//проверка на отсудствие команд
 	if(str.empty())
 	{
 		std::cout << x << " " << y << " " << z << '\n';
@@ -40,7 +42,6 @@ bool run_gcode(const std::string& str)
 		return false;
 	}
 	std::stringstream r{ str };
-
 
 	int xa = 0;
 	int ya = 0;
@@ -54,6 +55,8 @@ bool run_gcode(const std::string& str)
 	char yt;
 	char zt;
 	int line = 1;
+
+	//считываем и проверяем начальные координаты
 	if(!(r >> xa >> ya >> za))
 	{
 		std::cout << x << " " << y << " " << z << '\n';
@@ -68,6 +71,7 @@ bool run_gcode(const std::string& str)
 	while(!r.eof())
 	{
 		line++;
+		//считываем и парсим строку
 		if(r >> xc >> xa >> xt >> yc >> ya >> yt >> zc >> za >> zt)
 		{
 			if((xc == 'X') &&
@@ -77,15 +81,18 @@ bool run_gcode(const std::string& str)
 			   (yt == ';') &&
 			   (zt == ';'))
 			{
+				//если прошли проверку исполняем команду
 				x += xa;
 				y += ya;
 				z += za;
-				continue;
 			}
 		}
-		std::cout << x << " " << y << " " << z << '\n';
-		std::cout << "ERROR SCRIPT LINE " << line;
-		return false;
+		else
+		{
+			std::cout << x << " " << y << " " << z << '\n';
+			std::cout << "ERROR SCRIPT LINE " << line;
+			return false;
+		}
 	}
 
 	std::cout << x << " " << y << " " << z << '\n';
